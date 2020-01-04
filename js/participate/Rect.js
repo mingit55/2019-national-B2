@@ -11,6 +11,7 @@ class Rect extends Clip {
         const {X, Y} = this.getXY(e);
         const {x, y, w, h} = this.data;
 
+        console.log(x <= X && X <= x + w && y <= Y && Y <= y + h);
         return x <= X && X <= x + w && y <= Y && Y <= y + h;
     }
 

@@ -31,9 +31,10 @@ class Viewport {
         this.pause();
 
         let clipList = this.current_track.clipList;
-        clipList.forEach(x => x.active = false);
+        clipList.forEach(x => x.active = false); // reverse 문제 해결바람
         let clip = this.current_track.clipList.find(x => x.select(e));
-        clip.active = true;
+        if(clip) clip.active = true;
+
         return clip; // 해당되는 클립을 리턴해야함
     }
 
