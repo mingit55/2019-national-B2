@@ -15,6 +15,16 @@ Number.prototype.parseTimer = function(){
     return `${hour}:${min}:${sec}:${msec}`;
 };
 
+Date.prototype.yymmdd = function(){
+    let year = `${this.getFullYear()}`.substr(-2, 2);
+    let month = this.getMonth() + 1;
+    month = month < 10 ? "0" + month : month;
+    let date = this.getDate();
+    date = date < 10 ? "0" + date : date;
+
+    return year + month + date;
+};
+
 class App {
     static movieselect = new Event("movieselect");
 
@@ -60,6 +70,7 @@ class App {
             select_del: document.querySelector("#seldel-btn"),
             download: document.querySelector("#download-btn"),
             merge: document.querySelector("#merge-btn"),
+            reset: document.querySelector("#reset-btn"),
         };
 
         // Viewport
@@ -140,27 +151,76 @@ class App {
 
         // 재생 버튼
         this.$buttons.play.addEventListener("click", () => {
-            if(this.viewport.current_track){
-                this.viewport.play();
-            }
+            if(this.viewport.current_track === null) return alert("동영상을 선택해주세요.");
+            this.viewport.play();
         });
 
         // 정지 버튼
         this.$buttons.pause.addEventListener("click", () => {
-            if(this.viewport.current_track){
-                this.viewport.pause();
-            }
+            if(this.viewport.current_track === null) return alert("동영상을 선택해주세요.");
+            this.viewport.pause();
         });
 
         // 전체 삭제
         this.$buttons.all_del.addEventListener("click", () => {
+            if(this.viewport.current_track === null) return alert("동영상을 선택해주세요.");
             this.viewport.current_track.deleteAll();
         });
         
         // 선택 삭제
         this.$buttons.select_del.addEventListener("click", () => {
+            if(this.viewport.current_track === null) return alert("동영상을 선택해주세요.");
             this.viewport.current_track.selectDelete();
         });
+
+        // 다운로드
+        this.$buttons.download.addEventListener("click", () => {
+            if(this.viewport.current_track === null) return alert("동영상을 선택해주세요.");
+
+            let clipHTML = this.viewport.current_track.clipList.reduce((p, c) => p + c.outerHTML(), "");
+            
+            let html =  `<div>
+                            <div id="viewport" style="position: relative; width: ${this.width}px; height: ${this.height}px; margin: 0 auto; background: #000; display: flex; justify-content: center; align-items: center;">
+                                <video src="${this.viewport.current_track.$video.src}" width="${this.width}px; height: ${this.height}px; outline: 0;"></video>
+                                ${clipHTML}
+                            </div>
+                            <script>
+                                window.onload = function(){
+                                    const clipList = document.querySelectorAll(".clip");
+                                    const video = document.querySelector("video");
+                                    const viewport = document.querySelector("#viewport");
+                                    video.controls = true;
+                                    
+                                    (function render(){
+                                        const {currentTime} = video;
+
+                                        clipList.forEach(clip => {
+                                            let startTime = parseInt(clip.dataset.startTime);
+                                            let duration = parseInt(clip.dataset.duration);
+                                            
+                                            if(startTime <= currentTime && currentTime <= startTime + duration) viewport.append(clip);
+                                            else clip.remove();
+                                        });
+
+                                        requestAnimationFrame(() => {
+                                            render();
+                                        });
+                                    })();                                    
+                                }
+                            </script>
+                        </div>`;
+            
+            let contents = $(html)[0];
+            let blob = new Blob([contents.outerHTML], {type: "text/html"});
+            let url = URL.createObjectURL(blob);
+            
+            let a = document.createElement("a");
+            a.download = (new Date).yymmdd() + ".html";
+            a.href = url;
+            document.body.append(a);
+            a.click();
+            a.remove();
+        }); 
     }
 }
 

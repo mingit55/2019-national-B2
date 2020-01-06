@@ -82,19 +82,19 @@ class Text extends Clip {
         this.input = null;
     };
 
-    redraw(){
+    redraw(ctx){
         if(!this.data) return;
 
         const {x, y, text} = this.data;
-        this.ctx.fillStyle = this.color;
-        this.ctx.font = this.font;
-        this.ctx.fillText(text, x, y);    
+        ctx.fillStyle = this.color;
+        ctx.font = this.font;
+        ctx.fillText(text, x, y);    
 
         if(this.active){
             const {x, y, w, h} = this.getPosition();
-            this.ctx.strokeStyle = Clip.select_color;
-            this.ctx.lineWidth = 3;
-            this.ctx.strokeRect(x, y, w, h);
+            ctx.strokeStyle = Clip.select_color;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x, y, w, h);
         }
     }
 }

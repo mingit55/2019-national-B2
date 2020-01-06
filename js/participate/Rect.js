@@ -58,20 +58,20 @@ class Rect extends Clip {
         this.complate = true;
     }
 
-    redraw(){
+    redraw(ctx){
         if(!this.data) return;
 
         const {x, y, w, h} = this.data;
 
-        this.ctx.lineWidth = 5;
-        this.ctx.strokeStyle = this.ctx.fillStyle = this.color;
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = ctx.fillStyle = this.color;
 
-        if(this.complate) this.ctx.fillRect(x, y, w, h);
-        else this.ctx.strokeRect(x, y, w, h);
+        if(this.complate) ctx.fillRect(x, y, w, h);
+        else ctx.strokeRect(x, y, w, h);
 
         if(this.active){
-            this.ctx.strokeStyle = Clip.select_color;
-            this.ctx.strokeRect(x, y, w, h);
+            ctx.strokeStyle = Clip.select_color;
+            ctx.strokeRect(x, y, w, h);
         }
     }
 }

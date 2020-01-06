@@ -43,29 +43,29 @@ class Curve extends Clip {
         this.app.unset();
     }
 
-    redraw(){
+    redraw(ctx){
         if(this.history.length ===  0) return;
         if(this.active){
-            this.ctx.strokeStyle = Clip.select_color;
-            this.ctx.lineWidth = this.lineWidth * 3;
+            ctx.strokeStyle = Clip.select_color;
+            ctx.lineWidth = this.lineWidth * 3;
 
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.history[0][0], this.history[0][1]);
+            ctx.beginPath();
+            ctx.moveTo(this.history[0][0], this.history[0][1]);
             this.history.forEach(data => {
-                this.ctx.lineTo(data[0], data[1]);
+                ctx.lineTo(data[0], data[1]);
             });
-            this.ctx.stroke();
+            ctx.stroke();
         }
 
-        this.ctx.strokeStyle = this.color;
-        this.ctx.lineWidth = this.lineWidth;
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = this.lineWidth;
 
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.history[0][0], this.history[0][1]);
+        ctx.beginPath();
+        ctx.moveTo(this.history[0][0], this.history[0][1]);
         this.history.forEach(data => {
-            this.ctx.lineTo(data[0], data[1]);
+            ctx.lineTo(data[0], data[1]);
         });
-        this.ctx.stroke();
+        ctx.stroke();
         
     }
 }

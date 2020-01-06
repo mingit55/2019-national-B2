@@ -6,7 +6,7 @@ class Clip {
         this.track = track;
         this.active = false;
 
-        this.drawList = [() => this.redraw.apply(this)];
+        this.drawList = [ctx => this.redraw.call(this, ctx)];
 
         this.selDownList = [e => this.selectDown.call(this, e)];
         this.selMoveList = [e => this.selectMove.call(this, e)];
@@ -24,6 +24,40 @@ class Clip {
         this.line_pos = null;
         this.$line = this.template();
         this.$viewline = this.$line.firstElementChild;
+    }
+
+    outerHTML(){
+        let active = this.active;
+        this.active = false;
+
+        let canvas = document.createElement("canvas");
+        canvas.width = this.app.width;
+        canvas.height = this.app.height;
+
+        let ctx = canvas.getContext("2d");
+        
+        this.drawList.forEach(draw => draw(ctx));
+        let url = canvas.toDataURL("image/png");
+
+        let image = document.createElement("img");
+        image.classList.add("clip");
+        let style = image.style;
+        style.position = "absolute";
+        style.left = "0";
+        style.top = "0";
+        style.pointerEvents = "none";
+
+        image.dataset.startTime = this.startTime.toFixed(2);
+        image.dataset.duration = this.duration.toFixed(2);
+
+        image.src = url;
+        image.width = this.app.width;
+        image.height = this.app.height;
+
+
+        this.active = active;
+
+        return image.outerHTML;
     }
 
 
@@ -64,7 +98,7 @@ class Clip {
     }
 
     template(){
-        let line = $(`<div class="clip">
+        let line = $(`<div class="clip" draggable="true">
                         <div class="view-line d-flex">
                             <div class="left" data-movement="left"></div>
                             <div class="center" data-movement="center"></div>
