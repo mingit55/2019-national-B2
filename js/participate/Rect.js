@@ -5,14 +5,27 @@ class Rect extends Clip {
         this.complate = false;
     }
 
-    select(e){
+    selectDown(e){
         if(!this.data) return false;
 
         const {X, Y} = this.getXY(e);
         const {x, y, w, h} = this.data;
+        
+        let result = x <= X && X <= x + w && y <= Y && Y <= y + h;;
 
-        console.log(x <= X && X <= x + w && y <= Y && Y <= y + h);
-        return x <= X && X <= x + w && y <= Y && Y <= y + h;
+        if(result){
+            this.pos = {x: X - x, y: Y - y};
+        }
+
+        return result;
+    }
+
+    selectMove(e){
+        if(!this.pos) return;
+        const {X, Y} = this.getXY(e);
+
+        this.data.x = X - this.pos.x;
+        this.data.y = Y - this.pos.y;
     }
 
     mousedown(e){
@@ -29,6 +42,15 @@ class Rect extends Clip {
         
         this.data.w = X - this.cx;
         this.data.h = Y - this.cy;
+
+        if(this.data.w < 0) {
+            this.data.w *= -1;
+            this.data.x = this.cx - this.data.w;
+        }
+        if(this.data.h < 0){
+            this.data.h *= -1;
+            this.data.y = this.cy - this.data.h;
+        }
     }
 
     mouseup(){

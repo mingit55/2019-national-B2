@@ -7,6 +7,10 @@ class Clip {
         this.active = false;
 
         this.drawList = [() => this.redraw.apply(this)];
+        
+        this.selDownList = [e => this.selectDown.call(this, e)];
+        this.selMoveList = [e => this.selectMove.call(this, e)];
+
         this.startTime = 0;
         this.duration = this.track.$video.duration;
 
@@ -18,6 +22,21 @@ class Clip {
         this.font = `${app.fontSize} Nanum Gothic, sans-serif`;
 
         this.$line = this.template();
+    }
+
+
+    // 클립 선택 체크하기 (병합된 것 포함)
+    selectDownAll(e){
+        return this.selDownList.reduce((p, c) => p && c(e), true);
+    }
+    
+    selectMoveAll(e){
+        return this.selMoveList.forEach(func => func(e));
+    }
+
+    setActive(bool){
+        this.active = bool;
+        bool ? this.$line.classList.add("active") : this.$line.classList.remove("active");
     }
 
     getXY(e){
@@ -43,12 +62,18 @@ class Clip {
     }
 
     template(){
-        return $(`<div class="clip">
-                    <div class="view-line d-flex">
-                        <div class="left"></div>
-                        <div class="center"></div>
-                        <div class="right"></div>
-                    </div>
-                </div>`)[0];
+        let line = $(`<div class="clip">
+                        <div class="view-line d-flex">
+                            <div class="left"></div>
+                            <div class="center"></div>
+                            <div class="right"></div>
+                        </div>
+                    </div>`)[0];
+        line.addEventListener("click", () => {
+            this.track.clipList.forEach(clip => clip.setActive(false));
+            this.setActive(true)
+        });
+
+        return line;
     }
 }

@@ -75,7 +75,7 @@ class App {
 
         window.addEventListener("mousemove", e => {
             if(!this.tool || !this.clip || !this.viewport.current_track || e.which !== 1) return;
-            if(this.tool === "select") return;
+            if(this.tool === "select") this.clip.selectMoveAll(e);
             else  this.clip.mousemove && this.clip.mousemove(e);
         });
 
@@ -129,5 +129,5 @@ class App {
 }
 
 window.addEventListener("load", () => {
-    const app = new App();
+    window.app = new App();
 });

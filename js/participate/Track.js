@@ -14,10 +14,16 @@ class Track {
                             <div id="cursor"></div>
                             <div class="line"></div>
                         </div>`)[0];
+
+        this.$cursor = this.$list.querySelector("#cursor");
     }
 
     addClip(clip){
         this.$list.prepend(clip.$line);
-        this.clipList.unshift(clip);
+        this.clipList.push(clip);
+    }
+
+    seekCursor(percent){
+        this.$cursor.style.left = percent;       
     }
 }

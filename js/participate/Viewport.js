@@ -30,10 +30,12 @@ class Viewport {
     select(e){
         this.pause();
 
-        let clipList = this.current_track.clipList;
-        clipList.forEach(x => x.active = false); // reverse 문제 해결바람
-        let clip = this.current_track.clipList.find(x => x.select(e));
-        if(clip) clip.active = true;
+        let clipList = this.current_track.clipList.reverse();
+        clipList.forEach(x => x.setActive(false)); // reverse 문제 해결바람
+        let clip = this.current_track.clipList.find(x => x.selectDownAll(e));
+        if(clip) clip.setActive(true);
+
+        clipList.reverse();
 
         return clip; // 해당되는 클립을 리턴해야함
     }
@@ -43,6 +45,8 @@ class Viewport {
 
     frame(){
         this.render();
+        
+
         requestAnimationFrame(() => {
             this.frame();
         });
@@ -52,9 +56,7 @@ class Viewport {
         this.ctx.clearRect(0, 0, this.app.width, this.app.height);
         if(this.current_track)
             this.current_track.clipList.forEach(clip => {
-                clip.drawList.forEach(draw => {
-                    draw();
-                });
+                clip.drawList.forEach(draw => draw());
             });
     }
 
