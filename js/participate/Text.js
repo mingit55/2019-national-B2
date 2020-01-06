@@ -61,6 +61,13 @@ class Text extends Clip {
     }
 
     inputComplate(){
+        // 입력값이 없다면 삭제
+        if(this.input.value.trim() === ""){
+            this.$line.remove();
+
+            let idx = this.track.clipList.findIndex(x => x === this);
+            this.track.clipList.splice(idx, 1);
+        }
         this.ctx.font = this.font;
         this.measure = this.ctx.measureText(this.input.value);
 

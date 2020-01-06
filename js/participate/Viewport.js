@@ -28,8 +28,6 @@ class Viewport {
     }
 
     select(e){
-        this.pause();
-
         let clipList = this.current_track.clipList.reverse();
         clipList.forEach(x => x.setActive(false)); // reverse 문제 해결바람
         let clip = this.current_track.clipList.find(x => x.selectDownAll(e));
@@ -44,8 +42,14 @@ class Viewport {
     // View Method
 
     frame(){
-        this.render();
-        
+        if(this.current_track){
+            const {currentTime, duration} = this.current_track.$video;
+            this.app.$playtime.currentTime.innerText = currentTime.parseTimer();
+            this.app.$playtime.duration.innerText = duration.parseTimer();
+            this.current_track.seekCursor();
+
+            this.render();
+        }
 
         requestAnimationFrame(() => {
             this.frame();
@@ -53,11 +57,14 @@ class Viewport {
     }
 
     render(){
+        const { currentTime } = this.current_track.$video;
+
         this.ctx.clearRect(0, 0, this.app.width, this.app.height);
-        if(this.current_track)
-            this.current_track.clipList.forEach(clip => {
-                clip.drawList.forEach(draw => draw());
-            });
+        this.current_track.clipList.filter(clip => {
+            return clip.startTime <= currentTime && currentTime <= clip.startTime + clip.duration;
+        }).forEach(clip => {
+            clip.drawList.forEach(draw => draw());
+        });
     }
 
     play(){

@@ -1,3 +1,20 @@
+Number.prototype.parseTimer = function(){
+    let intNo = parseInt(this);
+
+    let hour = parseInt(intNo / 3600);
+    hour = hour < 10 ? "0" + hour : hour;
+
+    let min = parseInt(intNo / 60) % 60;
+    min = min < 10 ? "0" + min : min;
+
+    let sec = intNo % 60;
+    sec = sec < 10 ? "0" + sec : sec;
+
+    let msec = this.toFixed(2).substr(-2, 2);
+
+    return `${hour}:${min}:${sec}:${msec}`;
+};
+
 class App {
     static movieselect = new Event("movieselect");
 
@@ -17,8 +34,15 @@ class App {
         this.height = this.$viewport.offsetHeight;
 
         // DOM
-        this.$playtime = document.querySelector("#play-time");
-        this.$cliptime = document.querySelector("#clip-time");
+        this.$playtime = {
+            currentTime: document.querySelector("#play-time .current-time"),
+            duration: document.querySelector("#play-time .duration")
+        };
+        this.$cliptime = {
+            startTime: document.querySelector("#clip-time .start-time"),
+            duration: document.querySelector("#clip-time .duration")
+        }
+
         this.$cliplist = document.querySelector("#clip-list");
         this.$movies = document.querySelectorAll("#movie-list .movie");
 
@@ -64,6 +88,7 @@ class App {
     event(){
         window.addEventListener("mousedown", e => {
             if(e.target !== this.$viewport || !this.tool || !this.viewport.current_track || e.which !== 1) return;
+            this.viewport.pause();
             if(this.clip) return false;
             if(this.tool === "select") this.clip = this.viewport.select(e);
             else {
@@ -93,6 +118,7 @@ class App {
                 let track = this.trackList.find(track => track.id === id);
                 if(!track){
                     track = new Track(this, id);
+                    this.trackList.push(track);
                 }
                 this.viewport.track = track;
             });
@@ -124,6 +150,16 @@ class App {
             if(this.viewport.current_track){
                 this.viewport.pause();
             }
+        });
+
+        // 전체 삭제
+        this.$buttons.all_del.addEventListener("click", () => {
+            this.viewport.current_track.deleteAll();
+        });
+        
+        // 선택 삭제
+        this.$buttons.select_del.addEventListener("click", () => {
+            this.viewport.current_track.selectDelete();
         });
     }
 }

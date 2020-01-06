@@ -7,7 +7,7 @@ class Clip {
         this.active = false;
 
         this.drawList = [() => this.redraw.apply(this)];
-        
+
         this.selDownList = [e => this.selectDown.call(this, e)];
         this.selMoveList = [e => this.selectMove.call(this, e)];
 
@@ -21,7 +21,9 @@ class Clip {
         this.lineWidth = app.lineWidth;
         this.font = `${app.fontSize} Nanum Gothic, sans-serif`;
 
+        this.line_pos = null;
         this.$line = this.template();
+        this.$viewline = this.$line.firstElementChild;
     }
 
 
@@ -64,14 +66,59 @@ class Clip {
     template(){
         let line = $(`<div class="clip">
                         <div class="view-line d-flex">
-                            <div class="left"></div>
-                            <div class="center"></div>
-                            <div class="right"></div>
+                            <div class="left" data-movement="left"></div>
+                            <div class="center" data-movement="center"></div>
+                            <div class="right" data-movement="right"></div>
                         </div>
                     </div>`)[0];
+
         line.addEventListener("click", () => {
+            if(this.app.tool !== "select") return;
             this.track.clipList.forEach(clip => clip.setActive(false));
             this.setActive(true)
+        });
+
+        line.querySelectorAll(".left, .center, .right").forEach(item => {
+            item.addEventListener("mousedown", e => {
+                if(this.active)
+                    this.line_pos = {
+                        movement: e.target.dataset.movement,
+                        x: this.$viewline.offsetLeft,
+                        w: this.$viewline.offsetWidth,
+                        fx: this.track.getX(e)
+                    }; 
+            });
+        });
+        window.addEventListener("mouseup", () => this.line_pos = null);
+
+        window.addEventListener("mousemove", e => {
+            if(e.which !== 1 || this.line_pos === null) return;
+
+            const {offsetWidth} = this.app.$cliplist;
+            let x = this.$viewline.offsetLeft;
+            let w = this.$viewline.offsetWidth;
+
+            let cx = this.track.getX(e);
+
+            if(this.line_pos.movement === "left"){
+                x = cx > this.line_pos.x + this.line_pos.w - 30 ? this.line_pos.x + this.line_pos.w - 30 : cx;
+                w = this.line_pos.w + this.line_pos.x - x;
+            }
+            else if(this.line_pos.movement === "center"){
+                let offset = this.line_pos.fx - this.line_pos.x;
+                x = cx - offset;
+                x = x + w > offsetWidth ? offsetWidth - w : x < 0 ? 0 : x;
+            }
+            else if(this.line_pos.movement === "right"){
+                w = cx - this.line_pos.x;
+                w = w < 30 ? 30 : w + x > offsetWidth ? offsetWidth - x : w;
+            }
+
+            this.$viewline.style.width = w + "px";
+            this.$viewline.style.left = x + "px";
+            
+            this.startTime = this.track.$video.duration * x / offsetWidth;
+            this.duration = this.track.$video.duration * w / offsetWidth;
         });
 
         return line;
