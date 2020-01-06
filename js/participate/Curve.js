@@ -7,18 +7,15 @@ class Curve extends Clip {
     selectDown(e){
         const {X, Y} = this.getXY(e);
         let mw = parseInt(this.lineWidth); // 오차 범위 mistake width
+        
+        this.copy = Object.assign(this.history);
+        this.pos = {x: X, y: Y};
 
-        let result = this.history.some(path => {
+        return this.history.some(path => {
             let check_x = path[0] - mw <= X && X <= path[0] + mw;
             let check_y = path[1] - mw <= Y && Y <= path[1] + mw;
             return check_x && check_y;
         });
-        if(result) {
-            this.copy = Object.assign(this.history);
-            this.pos = {x: X, y: Y};
-        }
-
-        return result;
     }
 
     selectMove(e){

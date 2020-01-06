@@ -5,11 +5,9 @@ class Clip {
         this.app = app;
         this.track = track;
         this.active = false;
+        this.merge = false;
 
-        this.drawList = [ctx => this.redraw.call(this, ctx)];
-
-        this.selDownList = [e => this.selectDown.call(this, e)];
-        this.selMoveList = [e => this.selectMove.call(this, e)];
+        this.mergeList = [this];
 
         this.startTime = 0;
         this.duration = this.track.$video.duration;
@@ -63,15 +61,17 @@ class Clip {
 
     // 클립 선택 체크하기 (병합된 것 포함)
     selectDownAll(e){
-        return this.selDownList.reduce((p, c) => p && c(e), true);
+        return this.mergeList
+                        .map(clip => clip.selectDown(e))
+                        .reduce((p, c) => p || c);
     }
     
     selectMoveAll(e){
-        return this.selMoveList.forEach(func => func(e));
+        return this.mergeList.forEach(clip => clip.selectMove(e));
     }
 
     setActive(bool){
-        this.active = bool;
+        this.mergeList.forEach(clip => clip.active = bool);
         bool ? this.$line.classList.add("active") : this.$line.classList.remove("active");
     }
 
@@ -104,14 +104,30 @@ class Clip {
                             <div class="center" data-movement="center"></div>
                             <div class="right" data-movement="right"></div>
                         </div>
+                        <input type="checkbox" class="merge-check">
                     </div>`)[0];
 
-        line.addEventListener("click", () => {
+        line.addEventListener("click", e => {
             if(this.app.tool !== "select") return;
             this.track.clipList.forEach(clip => clip.setActive(false));
             this.setActive(true)
         });
 
+        // 클립 드롭 다운
+        line.addEventListener("dragstart", e => {
+            if(!e.target.classList.contains("clip")) return false;
+            this.track.dragTarget = e.target;
+        })
+        line.addEventListener("dragover", e => e.preventDefault());
+        line.addEventListener("drop", e => {
+            let dropped = e.target;
+            $(e.target).closest(".clip");
+            while(dropped && !dropped.classList.contains("clip")) dropped = dropped.parentElement;
+            if(!dropped.classList.contains("clip")) return;
+            this.track.swap(dropped);
+        });
+
+        // 클립 시간 조정하기
         line.querySelectorAll(".left, .center, .right").forEach(item => {
             item.addEventListener("mousedown", e => {
                 if(this.active)
@@ -153,6 +169,12 @@ class Clip {
             
             this.startTime = this.track.$video.duration * x / offsetWidth;
             this.duration = this.track.$video.duration * w / offsetWidth;
+        });
+
+        line.querySelector(".merge-check").addEventListener("click", e => {
+            e.stopPropagation();
+
+            this.merge = e.target.checked;
         });
 
         return line;

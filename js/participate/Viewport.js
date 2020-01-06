@@ -63,7 +63,7 @@ class Viewport {
         this.current_track.clipList.filter(clip => {
             return clip.startTime <= currentTime && currentTime <= clip.startTime + clip.duration;
         }).forEach(clip => {
-            clip.drawList.forEach(draw => draw(this.ctx));
+            clip.mergeList.forEach(clip => clip.redraw(this.ctx));
         });
     }
 

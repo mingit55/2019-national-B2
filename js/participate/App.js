@@ -221,6 +221,19 @@ class App {
             a.click();
             a.remove();
         }); 
+
+        // 병합하기
+        this.$buttons.merge.addEventListener("click", () => {
+            this.viewport.current_track.merge();
+        });
+
+        this.$buttons.reset.addEventListener("click", () => {
+            this.$viewport.innerHTML = "";
+            this.$cliplist.innerHTML = "";
+            this.trackList = [];
+            this.$viewport.append(this.no_video);
+            this.viewport = new Viewport(this);
+        });
     }
 }
 

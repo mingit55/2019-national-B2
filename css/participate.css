@@ -109,6 +109,14 @@
 
 .view-line .center { width: calc(100% - 20px); }
 
+.clip .merge-check {
+    position: absolute;
+    left: -30px;
+    width: 20px;
+    height: 20px;
+    top: calc(50% - 10px);
+}
+
 
 #movie-list .movie {
     cursor: pointer;

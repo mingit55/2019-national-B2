@@ -10,14 +10,10 @@ class Rect extends Clip {
 
         const {X, Y} = this.getXY(e);
         const {x, y, w, h} = this.data;
-        
-        let result = x <= X && X <= x + w && y <= Y && Y <= y + h;;
 
-        if(result){
-            this.pos = {x: X - x, y: Y - y};
-        }
+        this.pos = {x: X - x, y: Y - y};
 
-        return result;
+        return x <= X && X <= x + w && y <= Y && Y <= y + h;
     }
 
     selectMove(e){
