@@ -45,7 +45,7 @@ class Viewport {
         if(this.current_track){
             const {currentTime, duration} = this.current_track.$video;
             this.app.$playtime.currentTime.innerText = currentTime.parseTimer();
-            this.app.$playtime.duration.innerText = duration.parseTimer();
+            if(duration) this.app.$playtime.duration.innerText = duration.parseTimer();
             this.current_track.seekCursor();
 
             this.render();

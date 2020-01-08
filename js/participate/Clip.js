@@ -34,7 +34,7 @@ class Clip {
 
         let ctx = canvas.getContext("2d");
         
-        this.drawList.forEach(draw => draw(ctx));
+        this.mergeList.forEach(clip => clip.redraw(ctx));
         let url = canvas.toDataURL("image/png");
 
         let image = document.createElement("img");

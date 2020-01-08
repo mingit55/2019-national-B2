@@ -115,6 +115,7 @@ class Track {
         clip.$viewline.style.width = this.app.$cliplist.offsetWidth * duration / this.$video.duration + "px";
         clip.$viewline.style.left = this.app.$cliplist.offsetWidth * startTime / this.$video.duration + "px";
 
+        clip.merge = false;
         clip.mergeList = clip.mergeList.concat(mergeList);
 
         clip.$line.querySelector("input").checked = false;
